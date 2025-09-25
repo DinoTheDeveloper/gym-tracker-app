@@ -454,7 +454,7 @@ const GymTracker = () => {
         alignItems: 'center',
         zIndex: 10
       }}>
-        <button onClick={() => setTimer(90)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}>
+        <button onClick={() => setTimer(90)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, fontWeight: 'bold' }}>
           ⏱️ {timer > 0 ? `${timer}s` : 'Rest Timer'}
         </button>
         {/* <h4 style={{ color: '#000000ff', fontSize: 12, margin: 0 }}>Made with ❤️</h4>
