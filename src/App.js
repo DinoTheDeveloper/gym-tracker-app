@@ -27,7 +27,7 @@ const GymTracker = () => {
   const [allUsers, setAllUsers] = useState(() => loadFromLocalStorage('allUsers', ['User 1']));
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
-  const [timer, setTimer] = useState(0);
+  const [setTimer] = useState(0);
   const [mainTimer, setMainTimer] = useState(0);
   const [mainRunning, setMainRunning] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
