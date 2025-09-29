@@ -23,7 +23,15 @@ const GymTracker = () => {
   const [weights, setWeights] = useState(() => loadFromLocalStorage('weights', {}));
   const [notes, setNotes] = useState(() => loadFromLocalStorage('notes', {}));
   const [completed, setCompleted] = useState(() => loadFromLocalStorage('completed', {}));
-  const [collapsed, setCollapsed] = useState(() => loadFromLocalStorage('collapsed', { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true }));
+  const [collapsed, setCollapsed] = useState({
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: true,
+    sunday: true
+  });
   const [allUsers, setAllUsers] = useState(() => loadFromLocalStorage('allUsers', ['User 1']));
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
@@ -80,9 +88,9 @@ const GymTracker = () => {
     saveToLocalStorage('completed', completed);
   }, [completed]);
 
-  useEffect(() => {
-    saveToLocalStorage('collapsed', collapsed);
-  }, [collapsed]);
+  // useEffect(() => {
+  //   saveToLocalStorage('collapsed', collapsed);
+  // }, [collapsed]);
 
   useEffect(() => {
     saveToLocalStorage('allUsers', allUsers);
