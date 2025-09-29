@@ -582,7 +582,7 @@ const GymTracker = () => {
                         <div style={{ display: 'flex', gap: 4 }}>
                           <button
                             onClick={() => { setEditingUser(user); setEditUserName(user); }}
-                            style={{ background: 'none', border: 'none', color: '#88C0D0', cursor: 'pointer', fontSize: 12 }}>
+                            style={{ background: 'none', border: 'none', color: '#d08888ff', cursor: 'pointer', fontSize: 12 }}>
                             ✏️
                           </button>
                           {allUsers.length > 1 && (
@@ -607,10 +607,10 @@ const GymTracker = () => {
               style={{ width: '100%', padding: 12, marginBottom: 12, border: '1px solid #ddd', borderRadius: 8 }}
             />
             <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={addUser} style={{ flex: 1, padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+              <button onClick={addUser} style={{ flex: 1, padding: 12, background: '#3ddd3dff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
                 Add Partner
               </button>
-              <button onClick={() => { setShowModal(false); setNewUser(''); setEditingUser(null); setEditUserName(''); }} style={{ flex: 1, padding: 12, background: '#f0f0f0', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+              <button onClick={() => { setShowModal(false); setNewUser(''); setEditingUser(null); setEditUserName(''); }} style={{ flex: 1, padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
                 Close
               </button>
             </div>
@@ -671,7 +671,7 @@ const GymTracker = () => {
                 </div>
               )}
             </div>
-            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
               Close
             </button>
           </div>
@@ -686,7 +686,7 @@ const GymTracker = () => {
             {/* Reset Data Section */}
             <div style={{ marginBottom: 16, padding: 12, background: '#ffebee', borderRadius: 8, border: '1px solid #ffcdd2' }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: 14, color: '#c62828' }}>⚠️ Danger Zone</h3>
-              <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px 0' }}>
+              <p style={{ fontSize: 12, color: '#535252ff', margin: '0 0 8px 0' }}>
                 This will permanently delete all your workout data, weights, and progress.
               </p>
               <button
@@ -699,20 +699,20 @@ const GymTracker = () => {
                 style={{
                   width: '100%',
                   padding: 8,
-                  background: '#d32f2f',
-                  color: '#fff',
-                  border: 'none',
+                  background: '#ffe927ff',
+                  color: 'rgba(0, 0, 0, 1)',
+                  border: '3px solid #000000ff',
                   borderRadius: 6,
                   cursor: 'pointer',
                   fontSize: 12,
                   fontWeight: 'bold'
                 }}
               >
-                🗑️ Reset All Data
+                Reset All Data
               </button>
             </div>
 
-            <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+            <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
               Close
             </button>
           </div>
