@@ -23,7 +23,7 @@ const GymTracker = () => {
   const [weights, setWeights] = useState(() => loadFromLocalStorage('weights', {}));
   const [notes, setNotes] = useState(() => loadFromLocalStorage('notes', {}));
   const [completed, setCompleted] = useState(() => loadFromLocalStorage('completed', {}));
-  const [collapsed, setCollapsed] = useState(() => loadFromLocalStorage('collapsed', { tuesday: true, thursday: true, friday: true, saturday: true }));
+  const [collapsed, setCollapsed] = useState(() => loadFromLocalStorage('collapsed', { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true }));
   const [allUsers, setAllUsers] = useState(() => loadFromLocalStorage('allUsers', ['User 1']));
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
@@ -33,6 +33,7 @@ const GymTracker = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [editUserName, setEditUserName] = useState('');
   const [showProgress, setShowProgress] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [workoutStreak, setWorkoutStreak] = useState(() => {
     try {
       const saved = localStorage.getItem('workoutStreak');
@@ -50,12 +51,12 @@ const GymTracker = () => {
   });
 
   // Rest timer
-  useEffect(() => {
-    if (timer > 0) {
-      const t = setTimeout(() => setTimer(timer - 1), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [timer]);
+  // useEffect(() => {
+  //   if (timer > 0) {
+  //     const t = setTimeout(() => setTimer(timer - 1), 1000);
+  //     return () => clearTimeout(t);
+  //   }
+  // }, [timer]);
 
   // Main workout timer
   useEffect(() => {
@@ -86,6 +87,20 @@ const GymTracker = () => {
   useEffect(() => {
     saveToLocalStorage('allUsers', allUsers);
   }, [allUsers]);
+
+  // Prevent body scroll when modals are open
+  useEffect(() => {
+    if (showModal || showProgress || showSettings) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to reset on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showModal, showProgress, showSettings]);
 
   const saveWeight = (id, user, val) => {
     const num = Math.max(0, parseFloat(val) || 0);
@@ -236,41 +251,17 @@ const GymTracker = () => {
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', background: '#fff', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <header style={{ background: '#2E3440', padding: '12px 16px' }}>
+    <div style={{ maxWidth: 480, margin: '0 auto', background: '#000', minHeight: '100vh', fontFamily: 'system-ui' }}>
+      <header style={{ background: '#1a1a1a', padding: '12px 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h1 style={{ color: '#fff', fontSize: 18, margin: 0 }}>Revolve™️</h1>
-          <h4 style={{ color: '#fff', fontSize: 12, margin: 0 }}>v.0.1 BETA RELEASE</h4>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setShowProgress(true)} style={{
-              background: 'rgba(255,255,255,0.1)',
-              color: '#fff',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: 20,
-              cursor: 'pointer',
-              fontSize: 12
-            }}>
-              📊 Stats
-            </button>
-            <button onClick={() => setShowModal(true)} style={{
-              background: 'rgba(255,255,255,0.1)',
-              color: '#fff',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: 20,
-              cursor: 'pointer',
-              fontSize: 12
-            }}>
-              👥 Partners
-            </button>
-          </div>
+          <h1 style={{ color: '#fff', fontSize: 18, margin: 0 }}>RevolveMe™</h1>
+          <h4 style={{ color: '#fff', fontSize: 10, margin: 0 }}>v.2.0 BETA</h4>
         </div>
 
         {/* Workout Streak Display */}
         {workoutStreak > 0 && (
           <div style={{
-            background: 'rgba(163, 190, 140, 0.2)',
+            background: 'rgba(97, 164, 38, 0.2)',
             color: '#A3BE8C',
             padding: '6px 12px',
             borderRadius: 20,
@@ -282,62 +273,166 @@ const GymTracker = () => {
             🔥 {workoutStreak} day streak!
           </div>
         )}
-
-        {/* Main Timer - Centered and Bigger */}
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+        {/*main timer */}
+        {/* Navigation Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 12,
+          marginBottom: 16
+        }}>
           <div style={{
-            background: 'linear-gradient(135deg, #88C0D0, #5E81AC)',
-            borderRadius: 16,
-            padding: 20,
-            display: 'inline-block',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+            background: '#1a1a1a',
+            border: '1px solid #333',
+            borderRadius: 12,
+            padding: 16,
+            textAlign: 'center',
+            cursor: 'pointer'
           }}>
-            <div style={{ fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 12 }}>
-              {formatTime(mainTimer)}
-            </div>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              <button onClick={() => setMainRunning(!mainRunning)}
-                style={{
-                  background: mainRunning ? '#BF616A' : '#A3BE8C',
-                  border: 'none',
-                  borderRadius: 12,
-                  color: '#fff',
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: 14
-                }}>
-                {mainRunning ? 'Stop' : 'Start'}
-              </button>
-              {mainTimer > 0 && (
-                <button onClick={() => setMainTimer(0)}
-                  style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    border: 'none',
-                    borderRadius: 12,
-                    color: '#fff',
-                    padding: '8px 16px',
-                    cursor: 'pointer',
-                    fontSize: 14
-                  }}>
-                  Reset
-                </button>
-              )}
-            </div>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>🪧</div>
+            <div style={{ fontSize: 12, color: '#ccc' }}>Coming Soon</div>
+          </div>
+
+          <div onClick={() => setShowProgress(true)} style={{
+            background: '#1a1a1a',
+            border: '1px solid #333',
+            borderRadius: 12,
+            padding: 16,
+            textAlign: 'center',
+            cursor: 'pointer'
+          }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>📊</div>
+            <div style={{ fontSize: 12, color: '#ccc' }}>Analytics</div>
+          </div>
+
+          <div onClick={() => setShowSettings(true)} style={{
+            background: '#1a1a1a',
+            border: '1px solid #333',
+            borderRadius: 12,
+            padding: 16,
+            textAlign: 'center',
+            cursor: 'pointer'
+          }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>⚙️</div>
+            <div style={{ fontSize: 12, color: '#ccc' }}>Settings</div>
+          </div>
+
+          <div onClick={() => setShowModal(true)} style={{
+            background: '#1a1a1a',
+            border: '1px solid #333',
+            borderRadius: 12,
+            padding: 16,
+            textAlign: 'center',
+            cursor: 'pointer'
+          }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>👥</div>
+            <div style={{ fontSize: 12, color: '#ccc' }}>Add Partner</div>
           </div>
         </div>
+
+        {/* Main Workout Timer - Full Width */}
+        <div style={{
+          background: '#1a1a1a',
+          border: '1px solid #4cdf16ff',
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 12,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+            <div style={{ fontSize: 10, color: '#ccc', minWidth: 80 }}>WORKOUT</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#fff' }}>
+              {formatTime(mainTimer)}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={() => setMainRunning(!mainRunning)}
+              style={{
+                background: mainRunning ? '#dc2626' : '#fff',
+                color: mainRunning ? '#fff' : '#000',
+                border: 'none',
+                borderRadius: 8,
+                padding: '6px 14px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: 13
+              }}>
+              {mainRunning ? 'Stop' : 'Start'}
+            </button>
+            {mainTimer > 0 && (
+              <button onClick={() => setMainTimer(0)}
+                style={{
+                  background: '#333',
+                  border: 'none',
+                  borderRadius: 8,
+                  color: '#fff',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                  fontSize: 13
+                }}>
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Rest Timer - Full Width */}
+        {/* <div style={{
+          background: '#1a1a1a',
+          border: '1px solid #ff6b6b',
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+            <div style={{ fontSize: 10, color: '#ccc', minWidth: 80 }}>REST</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#fff' }}>
+              {formatTime(timer)}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={() => setTimer(timer > 0 ? 0 : 90)}
+              style={{
+                background: timer > 0 ? '#dc2626' : '#fff',
+                color: timer > 0 ? '#fff' : '#000',
+                border: 'none',
+                borderRadius: 8,
+                padding: '6px 14px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: 13
+              }}>
+              {timer > 0 ? 'Stop' : '90s'}
+            </button>
+            {timer > 0 && timer !== 90 && (
+              <button onClick={() => setTimer(90)}
+                style={{
+                  background: '#333',
+                  border: 'none',
+                  borderRadius: 8,
+                  color: '#fff',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                  fontSize: 13
+                }}>
+                Reset
+              </button>
+            )}
+          </div>
+        </div> */}
       </header>
 
       <main style={{ padding: 16, paddingBottom: 80 }}>
-        <div style={{ background: 'linear-gradient(135deg, #88C0D0, #5E81AC)', color: '#fff', padding: 16, borderRadius: 12, marginBottom: 16 }}>
-          <strong>Progressive Overload</strong><br />
-          Make sure you complete all sets with good form before increasing weight.
-        </div>
 
         {Object.entries(workouts).map(([day, data]) => (
-          <div key={day} style={{ marginBottom: 16, border: '1px solid #ddd', borderRadius: 12, overflow: 'hidden' }}>
+          <div key={day} style={{ marginBottom: 16, border: '1px solid #ffffffff', borderRadius: 12, overflow: 'hidden' }}>
             <div onClick={() => setCollapsed(prev => ({ ...prev, [day]: !prev[day] }))}
-              style={{ background: '#2E3440', color: '#fff', padding: 16, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>
+              style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: 16, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>
               <div style={{ fontSize: 14, fontWeight: 'bold' }}>{data.title}</div>
               <div style={{ transform: collapsed[day] ? 'rotate(-90deg)' : 'rotate(0)', transition: 'transform 0.3s' }}>▼</div>
             </div>
@@ -346,10 +441,12 @@ const GymTracker = () => {
                 {data.exercises.map((ex, i) => (
                   <div key={i} style={{
                     padding: 14,
-                    borderBottom: i < data.exercises.length - 1 ? '1px solid #eee' : '',
+                    borderBottom: i < data.exercises.length - 1 ? '1px solid #2a2a2a' : '',
                     display: 'flex',
                     flexDirection: 'column',
-                    background: ex.cardio ? '#FFE0B2' : '#fff'
+                    background: ex.cardio ? '#2a2a2aff' : '#0a0a0a',
+                    border: '1px solid #a8a8a8ff',
+                    color: '#fff',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: ex.id ? 8 : 0 }}>
                       <div style={{ flex: 1 }}>
@@ -357,13 +454,13 @@ const GymTracker = () => {
                           fontWeight: 600,
                           textDecoration: ex.id && isCompleted(ex.id) ? 'line-through' : 'none',
                           textDecorationThickness: ex.id && isCompleted(ex.id) ? '3.5px' : 'auto',
-                          textDecorationColor: ex.id && isCompleted(ex.id) ? '#d11b2dff' : 'auto',
+                          textDecorationColor: ex.id && isCompleted(ex.id) ? '#f2273bff' : 'auto',
                           fontSize: 14
                         }}>
                           {ex.name}
                         </div>
-                        <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
-                          <span style={{ color: '#BF616A', fontWeight: 600 }}>{ex.sets}</span>
+                        <div style={{ fontSize: 14, color: '#cdcdcdff', marginTop: 2 }}>
+                          <span style={{ color: '#97dd61ff', fontWeight: 700 }}>{ex.sets}</span>
                           {ex.note && <span> • {ex.note}</span>}
                         </div>
                       </div>
@@ -384,10 +481,10 @@ const GymTracker = () => {
                             alignItems: 'center',
                             gap: 8,
                             padding: 8,
-                            background: userIndex % 2 === 0 ? '#f9f9f9' : '#fff',
+                            background: userIndex % 2 === 0 ? '#1a1a1a' : '#0f0f0f',
                             borderRadius: 6
                           }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, minWidth: 60, color: '#2E3440' }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, minWidth: 60, color: '#fff' }}>
                               {user}:
                             </span>
                             <input
@@ -398,13 +495,15 @@ const GymTracker = () => {
                               style={{
                                 width: 70,
                                 padding: 6,
-                                border: '2px solid #ddd',
+                                border: '1px solid #333',
                                 borderRadius: 6,
                                 textAlign: 'center',
-                                fontSize: 13
+                                fontSize: 13,
+                                background: '#1a1a1a',
+                                color: '#fff'
                               }}
                             />
-                            <span style={{ fontSize: 12, color: '#666' }}>kg</span>
+                            <span style={{ fontSize: 12, color: '#999' }}>kg</span>
                             {getCurrentWeight(ex.id, user) && getPersonalRecords()[ex.id]?.user === user && getPersonalRecords()[ex.id]?.weight === getCurrentWeight(ex.id, user) && (
                               <span style={{ fontSize: 10, background: '#FFD700', color: '#8B4513', padding: '2px 6px', borderRadius: 10, fontWeight: 'bold' }}>
                                 PR!
@@ -421,10 +520,11 @@ const GymTracker = () => {
                           onChange={(e) => saveNote(ex.id, e.target.value)}
                           style={{
                             padding: 8,
-                            border: '1px solid #ddd',
+                            border: '1px solid #333',
                             borderRadius: 6,
                             fontSize: 13,
-                            background: '#fafafa'
+                            background: '#1a1a1a',
+                            color: '#fff',
                           }}
                         />
                       </div>
@@ -436,30 +536,6 @@ const GymTracker = () => {
           </div>
         ))}
       </main>
-
-      {/* Fixed bottom bar */}
-      {/* Fixed bottom bar */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        maxWidth: 480,
-        margin: '0 auto',
-        background: '#fff',
-        borderTop: '1px solid #ddd',
-        padding: 12,
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        zIndex: 10
-      }}>
-        <button onClick={() => setTimer(90)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, fontWeight: 'bold' }}>
-          ⏱️ {timer > 0 ? `${timer}s` : 'Rest Timer'}
-        </button>
-        {/* <h4 style={{ color: '#000000ff', fontSize: 12, margin: 0 }}>Made with ❤️</h4>
-        <div style={{ width: 80 }}></div> Spacer to center the middle text */}
-      </div>
 
       {/* Modal for managing users */}
       {showModal && (
@@ -578,7 +654,7 @@ const GymTracker = () => {
             <div style={{ marginBottom: 16, padding: 12, background: '#f9f9f9', borderRadius: 8 }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: 14 }}>🏆 Personal Records</h3>
               {Object.keys(getPersonalRecords()).length === 0 ? (
-                <p style={{ fontSize: 12, color: '#666', margin: 0 }}>No records yet. Start tracking weights!</p>
+                <p style={{ fontSize: 12, color: '#999', margin: 0 }}>No records yet. Start tracking weights!</p>
               ) : (
                 <div style={{ maxHeight: 120, overflowY: 'auto' }}>
                   {Object.entries(getPersonalRecords()).slice(0, 5).map(([exerciseId, record]) => {
@@ -595,7 +671,19 @@ const GymTracker = () => {
                 </div>
               )}
             </div>
-            {/* Add Reset Data Section */}
+            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Settings Modal */}
+      {showSettings && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
+          <div style={{ background: '#fff', padding: 24, borderRadius: 16, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto' }}>
+            <h2 style={{ marginBottom: 16, fontSize: 18 }}>⚙️ Settings</h2>
+
+            {/* Reset Data Section */}
             <div style={{ marginBottom: 16, padding: 12, background: '#ffebee', borderRadius: 8, border: '1px solid #ffcdd2' }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: 14, color: '#c62828' }}>⚠️ Danger Zone</h3>
               <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px 0' }}>
@@ -605,7 +693,7 @@ const GymTracker = () => {
                 onClick={() => {
                   if (window.confirm('⚠️ Are you absolutely sure?\n\nThis will permanently delete:\n• All weight records\n• All workout progress\n• All notes\n• Workout streak\n\nThis action cannot be undone.')) {
                     resetAllData();
-                    setShowProgress(false);
+                    setShowSettings(false);
                   }
                 }}
                 style={{
@@ -623,7 +711,8 @@ const GymTracker = () => {
                 🗑️ Reset All Data
               </button>
             </div>
-            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+
+            <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#88C0D0', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
               Close
             </button>
           </div>
