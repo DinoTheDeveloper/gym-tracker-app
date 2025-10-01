@@ -1116,7 +1116,7 @@ const GymTracker = () => {
               </div>
               {(!yearGoalLocked || !weightGoalLocked) && (
                 <div style={{ marginTop: 10, fontSize: 11, color: '#7a8fb8', fontStyle: 'italic' }}>
-                  ℹ️ Click "Lock In Goal" to save. Use "Reset All Data" in Settings to change locked goals.
+                  ℹ️ Click "Lock In Goal" to save. Once it's locked, it's locked.
                 </div>
               )}
             </div>
