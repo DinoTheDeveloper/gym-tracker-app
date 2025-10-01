@@ -1127,7 +1127,34 @@ const GymTracker = () => {
                 {workoutStreak} days
               </div>
             </div>
-
+            <div style={{ marginBottom: 12, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>✅ Overall Progress</h3>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#e8eef7', marginBottom: 6 }}>
+                  <span>Exercises Completed:</span>
+                  <span style={{ fontWeight: 700, color: '#61affe' }}>
+                    {getWorkoutProgress().completed} / {getWorkoutProgress().total}
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: 8,
+                  background: 'rgba(10, 14, 31, 0.6)',
+                  borderRadius: 4,
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${(getWorkoutProgress().completed / getWorkoutProgress().total) * 100}%`,
+                    height: '100%',
+                    background: 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: '#7a8fb8', textAlign: 'center' }}>
+                {Math.round((getWorkoutProgress().completed / getWorkoutProgress().total) * 100)}% Complete
+              </div>
+            </div>
             <div style={{ marginBottom: 20, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🏆 Personal Records</h3>
               <div>
