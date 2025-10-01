@@ -1157,12 +1157,31 @@ const GymTracker = () => {
             </div>
             <div style={{ marginBottom: 20, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🏆 Personal Records</h3>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6, color: '#e8eef7' }}>
-                  <span>Bench Press:</span>
-                  <span style={{ fontWeight: 700, color: '#61affe' }}>80kg (Alex)</span>
+              {Object.keys(getPersonalRecords()).length > 0 ? (
+                <div>
+                  {Object.entries(getPersonalRecords()).slice(0, 5).map(([exerciseId, record]) => {
+                    // Find the exercise name from workouts data
+                    let exerciseName = exerciseId;
+                    Object.values(workouts).forEach(day => {
+                      const exercise = day.exercises.find(ex => ex.id === exerciseId);
+                      if (exercise) exerciseName = exercise.name;
+                    });
+
+                    return (
+                      <div key={exerciseId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6, color: '#e8eef7' }}>
+                        <span>{exerciseName}:</span>
+                        <span style={{ fontWeight: 700, color: '#61affe' }}>
+                          {record.weight}kg ({record.user})
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              ) : (
+                <div style={{ fontSize: 13, color: '#7a8fb8', textAlign: 'center', fontStyle: 'italic' }}>
+                  No personal records yet. Start logging weights! 💪
+                </div>
+              )}
             </div>
 
             <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
