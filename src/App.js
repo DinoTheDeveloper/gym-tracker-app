@@ -35,7 +35,6 @@ const GymTracker = () => {
   const [allUsers, setAllUsers] = useState(() => loadFromLocalStorage('allUsers', ['User 1']));
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
-  const [setTimer] = useState(0);
   const [mainTimer, setMainTimer] = useState(0);
   const [mainRunning, setMainRunning] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -57,14 +56,6 @@ const GymTracker = () => {
       return null;
     }
   });
-
-  // Rest timer
-  // useEffect(() => {
-  //   if (timer > 0) {
-  //     const t = setTimeout(() => setTimer(timer - 1), 1000);
-  //     return () => clearTimeout(t);
-  //   }
-  // }, [timer]);
 
   // Main workout timer
   useEffect(() => {
@@ -246,7 +237,6 @@ const GymTracker = () => {
       setCompleted({});
       setMainTimer(0);
       setMainRunning(false);
-      setTimer(0);
       setWorkoutStreak(0);
       setLastWorkoutDate(null);
 
@@ -259,216 +249,215 @@ const GymTracker = () => {
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', background: '#000', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <header style={{ background: '#1a1a1a', padding: '12px 16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h1 style={{ color: '#fff', fontSize: 18, margin: 0 }}>RevolveMe™</h1>
-          <h4 style={{ color: '#fff', fontSize: 10, margin: 0 }}>v.2.0 BETA</h4>
+    <div style={{
+      maxWidth: 480,
+      margin: '0 auto',
+      background: 'linear-gradient(180deg, #0a0e27 0%, #0d1117 100%)',
+      minHeight: '100vh',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    }}>
+      <header style={{
+        background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)',
+        padding: '16px 20px',
+        borderBottom: '1px solid rgba(139, 172, 255, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20
+        }}>
+          <h1 style={{
+            color: '#e8eef7',
+            fontSize: 22,
+            margin: 0,
+            fontWeight: 700,
+            letterSpacing: '-0.5px'
+          }}>RevolveMe™</h1>
+          <div style={{
+            background: 'rgba(139, 172, 255, 0.15)',
+            color: '#8bacff',
+            padding: '4px 10px',
+            borderRadius: 6,
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.5px'
+          }}>v.3.0</div>
         </div>
 
-        {/* Workout Streak Display */}
         {workoutStreak > 0 && (
           <div style={{
-            background: 'rgba(97, 164, 38, 0.2)',
-            color: '#A3BE8C',
-            padding: '6px 12px',
-            borderRadius: 20,
+            background: 'linear-gradient(135deg, rgba(139, 172, 255, 0.2) 0%, rgba(97, 175, 254, 0.15) 100%)',
+            border: '1px solid rgba(139, 172, 255, 0.3)',
+            color: '#a8c5ff',
+            padding: '10px 16px',
+            borderRadius: 12,
             textAlign: 'center',
-            fontSize: 12,
-            fontWeight: 'bold',
-            marginBottom: 12
+            fontSize: 13,
+            fontWeight: 600,
+            marginBottom: 20,
+            boxShadow: '0 4px 12px rgba(139, 172, 255, 0.1)'
           }}>
             🔥 {workoutStreak} day streak!
           </div>
         )}
-        {/*main timer */}
-        {/* Navigation Grid */}
+
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 12,
-          marginBottom: 16
+          marginBottom: 20
         }}>
-          <div style={{
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: 12,
-            padding: 16,
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>🪧</div>
-            <div style={{ fontSize: 12, color: '#ccc' }}>Coming Soon</div>
-          </div>
-
-          <div onClick={() => setShowProgress(true)} style={{
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: 12,
-            padding: 16,
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>📊</div>
-            <div style={{ fontSize: 12, color: '#ccc' }}>Analytics</div>
-          </div>
-
-          <div onClick={() => setShowSettings(true)} style={{
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: 12,
-            padding: 16,
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>⚙️</div>
-            <div style={{ fontSize: 12, color: '#ccc' }}>Settings</div>
-          </div>
-
-          <div onClick={() => setShowModal(true)} style={{
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: 12,
-            padding: 16,
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>👥</div>
-            <div style={{ fontSize: 12, color: '#ccc' }}>Add Partner</div>
-          </div>
+          {[
+            { icon: '🪧', label: 'Coming Soon' },
+            { icon: '📊', label: 'Analytics', onClick: () => setShowProgress(true) },
+            { icon: '⚙️', label: 'Settings', onClick: () => setShowSettings(true) },
+            { icon: '👥', label: 'Add Partner', onClick: () => setShowModal(true) }
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              onClick={item.onClick}
+              style={{
+                background: 'rgba(26, 31, 58, 0.6)',
+                border: '1px solid rgba(139, 172, 255, 0.15)',
+                borderRadius: 12,
+                padding: 18,
+                textAlign: 'center',
+                cursor: item.onClick ? 'pointer' : 'default',
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(10px)'
+              }}
+              onMouseEnter={(e) => {
+                if (item.onClick) {
+                  e.currentTarget.style.background = 'rgba(139, 172, 255, 0.15)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (item.onClick) {
+                  e.currentTarget.style.background = 'rgba(26, 31, 58, 0.6)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+              <div style={{ fontSize: 12, color: '#b4c5e4', fontWeight: 500 }}>{item.label}</div>
+            </div>
+          ))}
         </div>
 
-        {/* Main Workout Timer - Full Width */}
         <div style={{
-          background: '#1a1a1a',
-          border: '1px solid #4cdf16ff',
-          borderRadius: 12,
-          padding: 16,
-          marginBottom: 12,
+          background: 'linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(15, 20, 25, 0.8) 100%)',
+          border: '1px solid rgba(139, 172, 255, 0.3)',
+          borderRadius: 14,
+          padding: 18,
+          marginBottom: 16,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
-            <div style={{ fontSize: 10, color: '#ccc', minWidth: 80 }}>WORKOUT</div>
-            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+            <div style={{
+              fontSize: 11,
+              color: '#7a8fb8',
+              minWidth: 80,
+              fontWeight: 600,
+              letterSpacing: '0.5px'
+            }}>WORKOUT</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#e8eef7' }}>
               {formatTime(mainTimer)}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setMainRunning(!mainRunning)}
               style={{
-                background: mainRunning ? '#dc2626' : '#fff',
-                color: mainRunning ? '#fff' : '#000',
+                background: mainRunning ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #8bacff 0%, #61affe 100%)',
+                color: '#fff',
                 border: 'none',
-                borderRadius: 8,
-                padding: '6px 14px',
+                borderRadius: 10,
+                padding: '8px 18px',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: 13
+                fontWeight: 600,
+                fontSize: 13,
+                boxShadow: mainRunning ? '0 4px 12px rgba(239, 68, 68, 0.3)' : '0 4px 12px rgba(139, 172, 255, 0.3)',
+                transition: 'all 0.2s ease'
               }}>
               {mainRunning ? 'Stop' : 'Start'}
             </button>
             {mainTimer > 0 && (
               <button onClick={() => setMainTimer(0)}
                 style={{
-                  background: '#333',
-                  border: 'none',
-                  borderRadius: 8,
-                  color: '#fff',
-                  padding: '6px 14px',
+                  background: 'rgba(26, 31, 58, 0.8)',
+                  border: '1px solid rgba(139, 172, 255, 0.2)',
+                  borderRadius: 10,
+                  color: '#b4c5e4',
+                  padding: '8px 18px',
                   cursor: 'pointer',
-                  fontSize: 13
+                  fontSize: 13,
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease'
                 }}>
                 Reset
               </button>
             )}
           </div>
         </div>
-
-        {/* Rest Timer - Full Width */}
-        {/* <div style={{
-          background: '#1a1a1a',
-          border: '1px solid #ff6b6b',
-          borderRadius: 12,
-          padding: 16,
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
-            <div style={{ fontSize: 10, color: '#ccc', minWidth: 80 }}>REST</div>
-            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#fff' }}>
-              {formatTime(timer)}
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button onClick={() => setTimer(timer > 0 ? 0 : 90)}
-              style={{
-                background: timer > 0 ? '#dc2626' : '#fff',
-                color: timer > 0 ? '#fff' : '#000',
-                border: 'none',
-                borderRadius: 8,
-                padding: '6px 14px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: 13
-              }}>
-              {timer > 0 ? 'Stop' : '90s'}
-            </button>
-            {timer > 0 && timer !== 90 && (
-              <button onClick={() => setTimer(90)}
-                style={{
-                  background: '#333',
-                  border: 'none',
-                  borderRadius: 8,
-                  color: '#fff',
-                  padding: '6px 14px',
-                  cursor: 'pointer',
-                  fontSize: 13
-                }}>
-                Reset
-              </button>
-            )}
-          </div>
-        </div> */}
       </header>
 
-      <main style={{ padding: 16, paddingBottom: 80 }}>
-
+      <main style={{ padding: 20, paddingBottom: 80 }}>
         {Object.entries(workouts).map(([day, data]) => (
-          <div key={day} style={{ marginBottom: 16, border: '1px solid #ffffffff', borderRadius: 12, overflow: 'hidden' }}>
+          <div key={day} style={{
+            marginBottom: 16,
+            border: '1px solid rgba(139, 172, 255, 0.2)',
+            borderRadius: 14,
+            overflow: 'hidden',
+            background: 'rgba(26, 31, 58, 0.4)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+          }}>
             <div onClick={() => setCollapsed(prev => ({ ...prev, [day]: !prev[day] }))}
-              style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: 16, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: 14, fontWeight: 'bold' }}>{data.title}</div>
-              <div style={{ transform: collapsed[day] ? 'rotate(-90deg)' : 'rotate(0)', transition: 'transform 0.3s' }}>▼</div>
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 31, 58, 0.9) 0%, rgba(15, 20, 25, 0.9) 100%)',
+                borderBottom: !collapsed[day] ? '1px solid rgba(139, 172, 255, 0.15)' : 'none',
+                color: '#e8eef7',
+                padding: 18,
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>{data.title}</div>
+              <div style={{
+                transform: collapsed[day] ? 'rotate(-90deg)' : 'rotate(0)',
+                transition: 'transform 0.3s ease',
+                color: '#8bacff'
+              }}>▼</div>
             </div>
             {!collapsed[day] && (
               <div>
                 {data.exercises.map((ex, i) => (
                   <div key={i} style={{
-                    padding: 14,
-                    borderBottom: i < data.exercises.length - 1 ? '1px solid #2a2a2a' : '',
+                    padding: 16,
+                    borderBottom: i < data.exercises.length - 1 ? '1px solid rgba(139, 172, 255, 0.1)' : '',
                     display: 'flex',
                     flexDirection: 'column',
-                    background: ex.cardio ? '#2a2a2aff' : '#0a0a0a',
-                    border: '1px solid #a8a8a8ff',
-                    color: '#fff',
+                    background: ex.cardio ? 'rgba(15, 20, 37, 0.6)' : 'rgba(10, 14, 31, 0.6)',
+                    color: '#e8eef7',
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: ex.id ? 8 : 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: ex.id ? 12 : 0 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{
                           fontWeight: 600,
                           textDecoration: ex.id && isCompleted(ex.id) ? 'line-through' : 'none',
-                          textDecorationThickness: ex.id && isCompleted(ex.id) ? '3.5px' : 'auto',
-                          textDecorationColor: ex.id && isCompleted(ex.id) ? '#f2273bff' : 'auto',
-                          fontSize: 14
+                          textDecorationThickness: ex.id && isCompleted(ex.id) ? '2px' : 'auto',
+                          textDecorationColor: ex.id && isCompleted(ex.id) ? '#ef4444' : 'auto',
+                          fontSize: 15,
+                          color: '#e8eef7'
                         }}>
                           {ex.name}
                         </div>
-                        <div style={{ fontSize: 14, color: '#cdcdcdff', marginTop: 2 }}>
-                          <span style={{ color: '#97dd61ff', fontWeight: 700 }}>{ex.sets}</span>
+                        <div style={{ fontSize: 13, color: '#8fa3c7', marginTop: 4 }}>
+                          <span style={{ color: '#61affe', fontWeight: 600 }}>{ex.sets}</span>
                           {ex.note && <span> • {ex.note}</span>}
                         </div>
                       </div>
@@ -476,23 +465,28 @@ const GymTracker = () => {
                         <input type="checkbox"
                           checked={isCompleted(ex.id)}
                           onChange={() => toggleCompleted(ex.id)}
-                          style={{ marginLeft: 8, transform: 'scale(1.2)' }} />
+                          style={{
+                            marginLeft: 12,
+                            transform: 'scale(1.3)',
+                            accentColor: '#61affe',
+                            cursor: 'pointer'
+                          }} />
                       )}
                     </div>
 
-                    {/* Weight inputs for all users */}
                     {ex.id && allUsers.length > 0 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
                         {allUsers.map((user, userIndex) => (
                           <div key={user} style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 8,
-                            padding: 8,
-                            background: userIndex % 2 === 0 ? '#1a1a1a' : '#0f0f0f',
-                            borderRadius: 6
+                            gap: 10,
+                            padding: 12,
+                            background: userIndex % 2 === 0 ? 'rgba(26, 31, 58, 0.5)' : 'rgba(15, 20, 37, 0.5)',
+                            borderRadius: 10,
+                            border: '1px solid rgba(139, 172, 255, 0.1)'
                           }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, minWidth: 60, color: '#fff' }}>
+                            <span style={{ fontSize: 14, fontWeight: 600, minWidth: 60, color: '#b4c5e4' }}>
                               {user}:
                             </span>
                             <input
@@ -502,37 +496,45 @@ const GymTracker = () => {
                               onChange={(e) => saveWeight(ex.id, user, e.target.value)}
                               style={{
                                 width: 70,
-                                padding: 6,
-                                border: '1px solid #333',
-                                borderRadius: 6,
+                                padding: 8,
+                                border: '1px solid rgba(139, 172, 255, 0.2)',
+                                borderRadius: 8,
                                 textAlign: 'center',
-                                fontSize: 13,
-                                background: '#1a1a1a',
-                                color: '#fff'
+                                fontSize: 14,
+                                background: 'rgba(10, 14, 31, 0.6)',
+                                color: '#e8eef7',
+                                fontWeight: 600
                               }}
                             />
-                            <span style={{ fontSize: 12, color: '#999' }}>kg</span>
+                            <span style={{ fontSize: 12, color: '#7a8fb8' }}>kg</span>
                             {getCurrentWeight(ex.id, user) && getPersonalRecords()[ex.id]?.user === user && getPersonalRecords()[ex.id]?.weight === getCurrentWeight(ex.id, user) && (
-                              <span style={{ fontSize: 10, background: '#FFD700', color: '#8B4513', padding: '2px 6px', borderRadius: 10, fontWeight: 'bold' }}>
+                              <span style={{
+                                fontSize: 10,
+                                background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+                                color: '#1a1f3a',
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                fontWeight: 700,
+                                boxShadow: '0 2px 8px rgba(255, 215, 0, 0.3)'
+                              }}>
                                 PR!
                               </span>
                             )}
                           </div>
                         ))}
 
-                        {/* Notes input */}
                         <input
                           type="text"
                           placeholder="Notes..."
                           value={getCurrentNote(ex.id)}
                           onChange={(e) => saveNote(ex.id, e.target.value)}
                           style={{
-                            padding: 8,
-                            border: '1px solid #333',
-                            borderRadius: 6,
+                            padding: 10,
+                            border: '1px solid rgba(139, 172, 255, 0.2)',
+                            borderRadius: 10,
                             fontSize: 13,
-                            background: '#1a1a1a',
-                            color: '#fff',
+                            background: 'rgba(26, 31, 58, 0.5)',
+                            color: '#e8eef7',
                           }}
                         />
                       </div>
@@ -545,60 +547,53 @@ const GymTracker = () => {
         ))}
       </main>
 
-      {/* Modal for managing users */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 16, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto' }}>
-            <h2 style={{ marginBottom: 16, fontSize: 18 }}>Manage Gym Partners</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 28, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+            <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>Manage Gym Partners</h2>
 
-            <div style={{ marginBottom: 16 }}>
-              <strong>Current Partners:</strong>
-              <div style={{ marginTop: 8 }}>
+            <div style={{ marginBottom: 20 }}>
+              <strong style={{ color: '#b4c5e4', fontSize: 14 }}>Current Partners:</strong>
+              <div style={{ marginTop: 12 }}>
                 {allUsers.map(user => (
                   <div key={user} style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    background: '#f5f5f5',
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    margin: '4px 0',
-                    fontSize: 14
+                    background: 'rgba(26, 31, 58, 0.6)',
+                    border: '1px solid rgba(139, 172, 255, 0.15)',
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    margin: '6px 0',
+                    fontSize: 14,
+                    color: '#e8eef7'
                   }}>
                     {editingUser === user ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                         <input
                           value={editUserName}
                           onChange={(e) => setEditUserName(e.target.value)}
-                          style={{ flex: 1, padding: 4, border: '1px solid #ddd', borderRadius: 4, fontSize: 13 }}
+                          style={{ flex: 1, padding: 4, border: '1px solid rgba(139, 172, 255, 0.3)', borderRadius: 6, fontSize: 13, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7' }}
                           autoFocus
                         />
                         <button
                           onClick={() => editUser(user, editUserName)}
-                          style={{ background: '#A3BE8C', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
+                          style={{ background: '#61affe', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>
                           ✓
                         </button>
                         <button
                           onClick={() => { setEditingUser(null); setEditUserName(''); }}
-                          style={{ background: '#BF616A', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
+                          style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>
                           ✕
                         </button>
                       </div>
                     ) : (
                       <>
                         <span>{user}</span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button
-                            onClick={() => { setEditingUser(user); setEditUserName(user); }}
-                            style={{ background: 'none', border: 'none', color: '#d08888ff', cursor: 'pointer', fontSize: 12 }}>
-                            ✏️
-                          </button>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={() => { setEditingUser(user); setEditUserName(user); }} style={{ background: 'none', border: 'none', color: '#8bacff', cursor: 'pointer', fontSize: 14 }}>✏️</button>
                           {allUsers.length > 1 && (
-                            <button
-                              onClick={() => deleteUser(user)}
-                              style={{ background: 'none', border: 'none', color: '#BF616A', cursor: 'pointer', fontSize: 12 }}>
-                              🗑️
-                            </button>
+                            <button onClick={() => deleteUser(user)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 14 }}>🗑️</button>
                           )}
                         </div>
                       </>
@@ -612,13 +607,13 @@ const GymTracker = () => {
               value={newUser}
               onChange={(e) => setNewUser(e.target.value)}
               placeholder="Enter new partner name..."
-              style={{ width: '100%', padding: 12, marginBottom: 12, border: '1px solid #ddd', borderRadius: 8 }}
+              style={{ width: '100%', padding: 12, marginBottom: 16, border: '1px solid rgba(139, 172, 255, 0.2)', borderRadius: 10, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7', fontSize: 14 }}
             />
             <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={addUser} style={{ flex: 1, padding: 12, background: '#3ddd3dff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+              <button onClick={addUser} style={{ flex: 1, padding: 12, background: 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(97, 175, 254, 0.3)' }}>
                 Add Partner
               </button>
-              <button onClick={() => { setShowModal(false); setNewUser(''); setEditingUser(null); setEditUserName(''); }} style={{ flex: 1, padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
                 Close
               </button>
             </div>
@@ -626,101 +621,83 @@ const GymTracker = () => {
         </div>
       )}
 
-      {/* Stats Modal */}
       {showProgress && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 16, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto' }}>
-            <h2 style={{ marginBottom: 16, fontSize: 18 }}>📊 Workout Stats</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 28, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+            <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>📊 Workout Stats</h2>
 
-            {/* Workout Progress */}
-            <div style={{ marginBottom: 16, padding: 12, background: '#f9f9f9', borderRadius: 8 }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: 14 }}>Today's Progress</h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ flex: 1, background: '#e0e0e0', borderRadius: 10, height: 8 }}>
+            <div style={{ marginBottom: 16, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>Today's Progress</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, background: 'rgba(10, 14, 31, 0.8)', borderRadius: 10, height: 10, overflow: 'hidden' }}>
                   <div style={{
                     width: `${(getWorkoutProgress().completed / getWorkoutProgress().total) * 100}%`,
-                    background: 'linear-gradient(90deg, #88C0D0, #5E81AC)',
+                    background: 'linear-gradient(90deg, #61affe 0%, #8bacff 100%)',
                     height: '100%',
-                    borderRadius: 10
+                    borderRadius: 10,
+                    boxShadow: '0 0 12px rgba(97, 175, 254, 0.5)'
                   }}></div>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 'bold' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#e8eef7' }}>
                   {getWorkoutProgress().completed}/{getWorkoutProgress().total}
                 </span>
               </div>
             </div>
 
-            {/* Workout Streak */}
-            <div style={{ marginBottom: 16, padding: 12, background: '#f9f9f9', borderRadius: 8 }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: 14 }}>🔥 Workout Streak</h3>
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#A3BE8C' }}>
+            <div style={{ marginBottom: 16, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🔥 Workout Streak</h3>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#61affe' }}>
                 {workoutStreak} days
               </div>
             </div>
 
-            {/* Personal Records */}
-            <div style={{ marginBottom: 16, padding: 12, background: '#f9f9f9', borderRadius: 8 }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: 14 }}>🏆 Personal Records</h3>
-              {Object.keys(getPersonalRecords()).length === 0 ? (
-                <p style={{ fontSize: 12, color: '#999', margin: 0 }}>No records yet. Start tracking weights!</p>
-              ) : (
-                <div style={{ maxHeight: 120, overflowY: 'auto' }}>
-                  {Object.entries(getPersonalRecords()).slice(0, 5).map(([exerciseId, record]) => {
-                    const exerciseName = Object.values(workouts)
-                      .flatMap(day => day.exercises)
-                      .find(ex => ex.id === exerciseId)?.name || exerciseId;
-                    return (
-                      <div key={exerciseId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                        <span>{exerciseName}:</span>
-                        <span style={{ fontWeight: 'bold' }}>{record.weight}kg ({record.user})</span>
-                      </div>
-                    );
-                  })}
+            <div style={{ marginBottom: 20, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🏆 Personal Records</h3>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6, color: '#e8eef7' }}>
+                  <span>Bench Press:</span>
+                  <span style={{ fontWeight: 700, color: '#61affe' }}>80kg (Alex)</span>
                 </div>
-              )}
+              </div>
             </div>
-            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+
+            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
               Close
             </button>
           </div>
         </div>
       )}
-      {/* Settings Modal */}
-      {showSettings && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 16, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto' }}>
-            <h2 style={{ marginBottom: 16, fontSize: 18 }}>⚙️ Settings</h2>
 
-            {/* Reset Data Section */}
-            <div style={{ marginBottom: 16, padding: 12, background: '#ffebee', borderRadius: 8, border: '1px solid #ffcdd2' }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: 14, color: '#c62828' }}>⚠️ Danger Zone</h3>
-              <p style={{ fontSize: 12, color: '#535252ff', margin: '0 0 8px 0' }}>
+      {showSettings && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 28, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+            <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>⚙️ Settings</h2>
+
+            <div style={{ marginBottom: 20, padding: 16, background: 'rgba(239, 68, 68, 0.1)', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+              <h3 style={{ margin: '0 0 10px 0', fontSize: 14, color: '#ef4444', fontWeight: 700 }}>⚠️ Danger Zone</h3>
+              <p style={{ fontSize: 12, color: '#b4c5e4', margin: '0 0 12px 0', lineHeight: 1.5 }}>
                 This will permanently delete all your workout data, weights, and progress.
               </p>
               <button
-                onClick={() => {
-                  if (window.confirm('⚠️ Are you absolutely sure?\n\nThis will permanently delete:\n• All weight records\n• All workout progress\n• All notes\n• Workout streak\n\nThis action cannot be undone.')) {
-                    resetAllData();
-                    setShowSettings(false);
-                  }
-                }}
+                onClick={resetAllData}
                 style={{
                   width: '100%',
-                  padding: 8,
-                  background: '#ffe927ff',
-                  color: 'rgba(0, 0, 0, 1)',
-                  border: '3px solid #000000ff',
-                  borderRadius: 6,
+                  padding: 10,
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                  color: '#1a1f3a',
+                  border: '2px solid #fbbf24',
+                  borderRadius: 10,
                   cursor: 'pointer',
-                  fontSize: 12,
-                  fontWeight: 'bold'
+                  fontSize: 13,
+                  fontWeight: 700,
+                  boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
                 }}
               >
                 Reset All Data
               </button>
             </div>
 
-            <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#de3434ff', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+            <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
               Close
             </button>
           </div>
