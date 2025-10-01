@@ -41,6 +41,20 @@ const GymTracker = () => {
   const [editUserName, setEditUserName] = useState('');
   const [showProgress, setShowProgress] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [yearGoal, setYearGoal] = useState(() => loadFromLocalStorage('yearGoal', ''));
+  const [weightGoal, setWeightGoal] = useState(() => loadFromLocalStorage('weightGoal', ''));
+  const [yearGoalLocked, setYearGoalLocked] = useState(() => loadFromLocalStorage('yearGoalLocked', false));
+  const [weightGoalLocked, setWeightGoalLocked] = useState(() => loadFromLocalStorage('weightGoalLocked', false));
+  const [motivationalQuote, setMotivationalQuote] = useState(() =>
+    loadFromLocalStorage('motivationalQuote', { text: 'Loading...', author: '' })
+  );
+  const [lastQuoteFetch, setLastQuoteFetch] = useState(() =>
+    loadFromLocalStorage('lastQuoteFetch', null)
+  );
+  const [showHelp, setShowHelp] = useState(false);
+  const [helpDismissed, setHelpDismissed] = useState(() =>
+    loadFromLocalStorage('helpDismissed', false)
+  );
   const [workoutStreak, setWorkoutStreak] = useState(() => {
     try {
       const saved = localStorage.getItem('workoutStreak');
@@ -79,13 +93,29 @@ const GymTracker = () => {
     saveToLocalStorage('completed', completed);
   }, [completed]);
 
-  // useEffect(() => {
-  //   saveToLocalStorage('collapsed', collapsed);
-  // }, [collapsed]);
+  useEffect(() => {
+    saveToLocalStorage('helpDismissed', helpDismissed);
+  }, [helpDismissed]);
 
   useEffect(() => {
     saveToLocalStorage('allUsers', allUsers);
   }, [allUsers]);
+
+  useEffect(() => {
+    saveToLocalStorage('yearGoal', yearGoal);
+  }, [yearGoal]);
+
+  useEffect(() => {
+    saveToLocalStorage('weightGoal', weightGoal);
+  }, [weightGoal]);
+
+  useEffect(() => {
+    saveToLocalStorage('yearGoalLocked', yearGoalLocked);
+  }, [yearGoalLocked]);
+
+  useEffect(() => {
+    saveToLocalStorage('weightGoalLocked', weightGoalLocked);
+  }, [weightGoalLocked]);
 
   // Prevent body scroll when modals are open
   useEffect(() => {
@@ -100,6 +130,24 @@ const GymTracker = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showModal, showProgress, showSettings]);
+
+  useEffect(() => {
+    const checkAndFetchQuote = () => {
+      const now = new Date().getTime();
+      const twelveHours = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+
+      if (!lastQuoteFetch || (now - lastQuoteFetch) >= twelveHours) {
+        fetchMotivationalQuote();
+      }
+    };
+
+    checkAndFetchQuote();
+
+    // Optional: Check every hour if it's time to update
+    const interval = setInterval(checkAndFetchQuote, 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [lastQuoteFetch]);
 
   const saveWeight = (id, user, val) => {
     const num = Math.max(0, parseFloat(val) || 0);
@@ -127,7 +175,8 @@ const GymTracker = () => {
     // Update workout streak when completing exercises
     if (newCompleted && !wasCompleted) {
       const today = new Date().toDateString();
-      if (lastWorkoutDate !== today) {
+      const wasCompletedToday = lastWorkoutDate === today;
+      if (newCompleted && !wasCompleted && !wasCompletedToday) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const isConsecutive = lastWorkoutDate === yesterday.toDateString();
@@ -239,12 +288,53 @@ const GymTracker = () => {
       setMainRunning(false);
       setWorkoutStreak(0);
       setLastWorkoutDate(null);
+      setYearGoal('');
+      setWeightGoal('');
+      setYearGoalLocked(false);
+      setWeightGoalLocked(false);
 
+      localStorage.removeItem('yearGoalLocked');
+      localStorage.removeItem('weightGoalLocked');
+      localStorage.removeItem('yearGoal');
+      localStorage.removeItem('weightGoal');
       localStorage.removeItem('weights');
       localStorage.removeItem('notes');
       localStorage.removeItem('completed');
       localStorage.removeItem('workoutStreak');
       localStorage.removeItem('lastWorkoutDate');
+    }
+  };
+
+  const getDaysInYear = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear(), 11, 31);
+    const total = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    const passed = Math.ceil((now - start) / (1000 * 60 * 60 * 24));
+    const remaining = total - passed;
+    return { remaining, total, passed, percentage: (passed / total) * 100 };
+  };
+
+  const fetchMotivationalQuote = async () => {
+    try {
+      const response = await fetch('https://api.quotable.io/random?tags=inspirational');
+      const data = await response.json();
+      const newQuote = {
+        text: data.content,
+        author: data.author
+      };
+      setMotivationalQuote(newQuote);
+      const now = new Date().getTime();
+      setLastQuoteFetch(now);
+      saveToLocalStorage('motivationalQuote', newQuote);
+      saveToLocalStorage('lastQuoteFetch', now);
+    } catch (error) {
+      console.error('Failed to fetch quote:', error);
+      // Fallback quote if API fails
+      setMotivationalQuote({
+        text: 'The only bad workout is the one that didn\'t happen.',
+        author: 'Unknown'
+      });
     }
   };
 
@@ -254,7 +344,11 @@ const GymTracker = () => {
       margin: '0 auto',
       background: 'linear-gradient(180deg, #0a0e27 0%, #0d1117 100%)',
       minHeight: '100vh',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      userSelect: 'none',
+      WebkitUserSelect: 'none',
+      MozUserSelect: 'none',
+      msUserSelect: 'none'
     }}>
       <header style={{
         background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)',
@@ -282,7 +376,7 @@ const GymTracker = () => {
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: '0.5px'
-          }}>v.3.0</div>
+          }}>DinoTheDeveloper</div>
         </div>
 
         {workoutStreak > 0 && (
@@ -402,6 +496,52 @@ const GymTracker = () => {
               </button>
             )}
           </div>
+        </div>
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(139, 172, 255, 0.1) 0%, rgba(97, 175, 254, 0.08) 100%)',
+          border: '1px solid rgba(139, 172, 255, 0.2)',
+          borderRadius: 14,
+          padding: 18,
+          marginTop: 16,
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            fontSize: 24,
+            opacity: 0.3
+          }}>💪</div>
+
+          <div style={{
+            fontSize: 11,
+            color: '#7a8fb8',
+            fontWeight: 600,
+            letterSpacing: '0.5px',
+            marginBottom: 10
+          }}>DAILY MOTIVATION</div>
+
+          <div style={{
+            fontSize: 14,
+            color: '#e8eef7',
+            lineHeight: 1.6,
+            fontStyle: 'italic',
+            marginBottom: 8
+          }}>
+            "{motivationalQuote.text}"
+          </div>
+
+          {motivationalQuote.author && (
+            <div style={{
+              fontSize: 12,
+              color: '#8bacff',
+              fontWeight: 600,
+              textAlign: 'right'
+            }}>
+              — {motivationalQuote.author}
+            </div>
+          )}
         </div>
       </header>
 
@@ -607,7 +747,7 @@ const GymTracker = () => {
               value={newUser}
               onChange={(e) => setNewUser(e.target.value)}
               placeholder="Enter new partner name..."
-              style={{ width: '100%', padding: 12, marginBottom: 16, border: '1px solid rgba(139, 172, 255, 0.2)', borderRadius: 10, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7', fontSize: 14 }}
+              style={{ width: '100%', padding: 12, marginBottom: 12, border: '1px solid rgba(139, 172, 255, 0.2)', borderRadius: 10, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7', fontSize: 14 }}
             />
             <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={addUser} style={{ flex: 1, padding: 12, background: 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(97, 175, 254, 0.3)' }}>
@@ -621,30 +761,367 @@ const GymTracker = () => {
         </div>
       )}
 
-      {showProgress && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 28, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
-            <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>📊 Workout Stats</h2>
+      {showHelp && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+          padding: 16,
+          backdropFilter: 'blur(8px)'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)',
+            padding: 28,
+            borderRadius: 20,
+            width: '100%',
+            maxWidth: 380,
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            border: '1px solid rgba(139, 172, 255, 0.3)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: 24
+            }}>
+              <div style={{
+                fontSize: 48,
+                marginBottom: 12
+              }}>💪</div>
+              <h2 style={{
+                margin: 0,
+                fontSize: 24,
+                color: '#e8eef7',
+                fontWeight: 700
+              }}>Welcome to RevolveMe™</h2>
+              <div style={{
+                fontSize: 13,
+                color: '#8bacff',
+                marginTop: 8,
+                fontStyle: 'italic'
+              }}>For the boys, by the boys</div>
+            </div>
 
-            <div style={{ marginBottom: 16, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>Today's Progress</h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ flex: 1, background: 'rgba(10, 14, 31, 0.8)', borderRadius: 10, height: 10, overflow: 'hidden' }}>
-                  <div style={{
-                    width: `${(getWorkoutProgress().completed / getWorkoutProgress().total) * 100}%`,
-                    background: 'linear-gradient(90deg, #61affe 0%, #8bacff 100%)',
-                    height: '100%',
-                    borderRadius: 10,
-                    boxShadow: '0 0 12px rgba(97, 175, 254, 0.5)'
-                  }}></div>
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#e8eef7' }}>
-                  {getWorkoutProgress().completed}/{getWorkoutProgress().total}
-                </span>
+            <div style={{
+              marginBottom: 20,
+              padding: 18,
+              background: 'rgba(139, 172, 255, 0.1)',
+              borderRadius: 12,
+              border: '1px solid rgba(139, 172, 255, 0.2)'
+            }}>
+              <h3 style={{
+                margin: '0 0 12px 0',
+                fontSize: 15,
+                color: '#61affe',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                📱 Best Experience
+              </h3>
+              <p style={{
+                fontSize: 13,
+                color: '#b4c5e4',
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                This is a <strong>mobile-only web app</strong>. For the best experience,
+                tap the <strong>Share button</strong> in your browser and select
+                <strong>"Add to Home Screen"</strong> to use it like a native app!
+              </p>
+            </div>
+
+            <div style={{
+              marginBottom: 20,
+              padding: 18,
+              background: 'rgba(26, 31, 58, 0.6)',
+              borderRadius: 12,
+              border: '1px solid rgba(139, 172, 255, 0.15)'
+            }}>
+              <h3 style={{
+                margin: '0 0 12px 0',
+                fontSize: 15,
+                color: '#61affe',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                💙 Made with Love
+              </h3>
+              <p style={{
+                fontSize: 13,
+                color: '#b4c5e4',
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                I built this app to keep myself motivated and to help us all stay on track
+                with our fitness goals. We're in this together! 👑
+              </p>
+            </div>
+
+            <div style={{
+              marginBottom: 20,
+              padding: 18,
+              background: 'rgba(26, 31, 58, 0.6)',
+              borderRadius: 12,
+              border: '1px solid rgba(139, 172, 255, 0.15)'
+            }}>
+              <h3 style={{
+                margin: '0 0 12px 0',
+                fontSize: 15,
+                color: '#61affe',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                🔄 Workout Updates
+              </h3>
+              <p style={{
+                fontSize: 13,
+                color: '#b4c5e4',
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                Workouts are updated <strong>every 1-2 months</strong> to keep things
+                fresh and maximize gains. Stay consistent! 🔥
+              </p>
+            </div>
+
+            <div style={{
+              marginBottom: 24,
+              padding: 18,
+              background: 'rgba(97, 175, 254, 0.1)',
+              borderRadius: 12,
+              border: '1px solid rgba(97, 175, 254, 0.2)'
+            }}>
+              <h3 style={{
+                margin: '0 0 12px 0',
+                fontSize: 15,
+                color: '#61affe',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                💬 Need Help?
+              </h3>
+              <p style={{
+                fontSize: 13,
+                color: '#b4c5e4',
+                margin: '0 0 12px 0',
+                lineHeight: 1.6
+              }}>
+                Got questions, bugs, or suggestions? Hit me up! I'm always here to help
+                improve the experience for everyone.
+              </p>
+              <div style={{
+                fontSize: 12,
+                color: '#8bacff',
+                fontWeight: 600,
+                padding: '8px 12px',
+                background: 'rgba(139, 172, 255, 0.1)',
+                borderRadius: 8,
+                textAlign: 'center'
+              }}>
+                📧 Message me anytime!
               </div>
             </div>
 
-            <div style={{ marginBottom: 16, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10
+            }}>
+              <button
+                onClick={() => {
+                  setShowHelp(false);
+                  setHelpDismissed(true);
+                }}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  background: 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 14,
+                  boxShadow: '0 4px 16px rgba(97, 175, 254, 0.4)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Got it! Don't show again
+              </button>
+              <button
+                onClick={() => setShowHelp(false)}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  background: 'rgba(26, 31, 58, 0.8)',
+                  color: '#b4c5e4',
+                  border: '1px solid rgba(139, 172, 255, 0.2)',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Close (show again later)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showProgress && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 20, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '92vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+            <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>📊 Workout Stats</h2>
+            <div style={{ marginBottom: 12, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>📅 Year Progress</h3>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, 4px)',
+                gap: '3px',
+                marginBottom: 12,
+                maxHeight: '120px',
+                overflowY: 'auto'
+              }}>
+                {Array.from({ length: getDaysInYear().total }, (_, i) => {
+                  const daysPassed = getDaysInYear().passed;
+                  const isPassed = i < daysPassed;
+                  const isCurrent = i === daysPassed;
+
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: '50%',
+                        background: isPassed
+                          ? 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)'
+                          : isCurrent
+                            ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
+                            : 'rgba(221, 221, 221, 0.8)',
+                        border: isCurrent ? '1px solid #fbbf24' : 'none',
+                        boxShadow: isPassed
+                          ? '0 1px 3px rgba(97, 175, 254, 0.3)'
+                          : isCurrent
+                            ? '0 1px 4px rgba(251, 191, 36, 0.5)'
+                            : 'none'
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <div style={{ fontSize: 13, color: '#e8eef7', fontWeight: 600, textAlign: 'center' }}>
+                {getDaysInYear().remaining} days remaining in {new Date().getFullYear()}
+              </div>
+              <div style={{ fontSize: 13, color: '#e8eef7', fontWeight: 600, textAlign: 'center' }}>
+                fulfil your promise
+              </div>
+            </div>
+            <div style={{ marginBottom: 12, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🎯 Year Goals</h3>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 12, color: '#8fa3c7', display: 'block', marginBottom: 6 }}>Main Goal for {new Date().getFullYear()}</label>
+                {yearGoalLocked ? (
+                  <div style={{ padding: 10, background: 'rgba(10, 14, 31, 0.6)', borderRadius: 8, color: '#e8eef7', fontSize: 13, wordBreak: 'break-word' }}>
+                    {yearGoal}
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      value={yearGoal}
+                      onChange={(e) => setYearGoal(e.target.value)}
+                      placeholder="Enter your main goal..."
+                      style={{ width: '100%', padding: 10, border: '1px solid rgba(139, 172, 255, 0.2)', borderRadius: 8, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
+                    />
+                    <button
+                      onClick={() => {
+                        if (yearGoal.trim() !== '') {
+                          setYearGoal(yearGoal.trim());
+                          setYearGoalLocked(true);
+                        }
+                      }}
+                      disabled={!yearGoal || yearGoal.trim() === ''}
+                      style={{
+                        width: '100%',
+                        padding: 8,
+                        background: yearGoal && yearGoal.trim() !== '' ? 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)' : 'rgba(26, 31, 58, 0.5)',
+                        color: yearGoal && yearGoal.trim() !== '' ? '#fff' : '#7a8fb8',
+                        border: 'none',
+                        borderRadius: 8,
+                        cursor: yearGoal && yearGoal.trim() !== '' ? 'pointer' : 'not-allowed',
+                        fontSize: 12,
+                        fontWeight: 600
+                      }}
+                    >
+                      Lock In Goal
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#8fa3c7', display: 'block', marginBottom: 6 }}>Weight Goal (kg)</label>
+                {weightGoalLocked ? (
+                  <div style={{ padding: 10, background: 'rgba(10, 14, 31, 0.6)', borderRadius: 8, color: '#e8eef7', fontSize: 13 }}>
+                    {weightGoal} kg
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="number"
+                      value={weightGoal}
+                      onChange={(e) => setWeightGoal(e.target.value)}
+                      placeholder="Enter target weight..."
+                      style={{ width: '100%', padding: 10, border: '1px solid rgba(139, 172, 255, 0.2)', borderRadius: 8, background: 'rgba(10, 14, 31, 0.6)', color: '#e8eef7', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
+                    />
+                    <button
+                      onClick={() => {
+                        const val = parseFloat(weightGoal);
+                        if (val > 0) {
+                          setWeightGoalLocked(true);
+                        }
+                      }}
+                      disabled={!weightGoal || parseFloat(weightGoal) <= 0}
+                      style={{
+                        width: '100%',
+                        padding: 8,
+                        background: weightGoal && parseFloat(weightGoal) > 0 ? 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)' : 'rgba(26, 31, 58, 0.5)',
+                        color: weightGoal && parseFloat(weightGoal) > 0 ? '#fff' : '#7a8fb8',
+                        border: 'none',
+                        borderRadius: 8,
+                        cursor: weightGoal && parseFloat(weightGoal) > 0 ? 'pointer' : 'not-allowed',
+                        fontSize: 12,
+                        fontWeight: 600
+                      }}
+                    >
+                      Lock In Goal
+                    </button>
+                  </div>
+                )}
+              </div>
+              {(!yearGoalLocked || !weightGoalLocked) && (
+                <div style={{ marginTop: 10, fontSize: 11, color: '#7a8fb8', fontStyle: 'italic' }}>
+                  ℹ️ Click "Lock In Goal" to save. Use "Reset All Data" in Settings to change locked goals.
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 12, padding: 16, background: 'rgba(26, 31, 58, 0.5)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: 14, color: '#b4c5e4', fontWeight: 600 }}>🔥 Workout Streak</h3>
               <div style={{ fontSize: 28, fontWeight: 700, color: '#61affe' }}>
                 {workoutStreak} days
@@ -672,6 +1149,33 @@ const GymTracker = () => {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(4px)' }}>
           <div style={{ background: 'linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%)', padding: 28, borderRadius: 20, width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', border: '1px solid rgba(139, 172, 255, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
             <h2 style={{ marginBottom: 20, fontSize: 20, color: '#e8eef7', fontWeight: 700 }}>⚙️ Settings</h2>
+
+            <div style={{ marginBottom: 20, padding: 16, background: 'rgba(26, 31, 58, 0.6)', borderRadius: 12, border: '1px solid rgba(139, 172, 255, 0.15)' }}>
+              <h3 style={{ margin: '0 0 10px 0', fontSize: 14, color: '#61affe', fontWeight: 700 }}>ℹ️ Help & Information</h3>
+              <p style={{ fontSize: 12, color: '#b4c5e4', margin: '0 0 12px 0', lineHeight: 1.5 }}>
+                View the welcome guide and app information.
+              </p>
+              <button
+                onClick={() => {
+                  setShowSettings(false);
+                  setShowHelp(true);
+                }}
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  background: 'linear-gradient(135deg, #61affe 0%, #8bacff 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(97, 175, 254, 0.3)'
+                }}
+              >
+                View Help Guide
+              </button>
+            </div>
 
             <div style={{ marginBottom: 20, padding: 16, background: 'rgba(239, 68, 68, 0.1)', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
               <h3 style={{ margin: '0 0 10px 0', fontSize: 14, color: '#ef4444', fontWeight: 700 }}>⚠️ Danger Zone</h3>
@@ -703,6 +1207,53 @@ const GymTracker = () => {
           </div>
         </div>
       )}
+      {/* Help button - place HERE, outside all loops */}
+      {!helpDismissed && (
+        <div
+          onClick={() => setShowHelp(true)}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #8bacff 0%, #61affe 100%)',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 24,
+            cursor: 'pointer',
+            boxShadow: '0 4px 20px rgba(97, 175, 254, 0.4)',
+            zIndex: 99,
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.3s ease',
+            animation: 'pulse 2s infinite'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 6px 24px rgba(97, 175, 254, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(97, 175, 254, 0.4)';
+          }}
+        >
+          ?
+        </div>
+      )}
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            box-shadow: 0 4px 20px rgba(97, 175, 254, 0.4);
+          }
+          50% {
+            box-shadow: 0 4px 30px rgba(97, 175, 254, 0.7);
+          }
+        }
+      `}</style>
     </div>
   );
 };
