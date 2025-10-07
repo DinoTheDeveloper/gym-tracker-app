@@ -9,7 +9,8 @@ const workouts = {
             { id: "lat_raises", name: "Lateral Raises", sets: "3 sets x 12–15 reps", note: "" },
             { id: "tricep_pushdown", name: "Cable Tricep Pushdowns", sets: "3 sets x 10–12 reps", note: "" },
             { id: "dips", name: "Dips (Weighted if possible)", sets: "2 sets to failure", note: "" },
-            { name: "Finisher Cardio", sets: "10 mins", note: "Stairmaster: 2 mins moderate, 1 min intense (repeat 3x) + 1 min cool down", cardio: true }
+            { name: "Finisher Cardio", sets: "10 mins", note: "Stairmaster: 2 mins moderate, 1 min intense (repeat 3x) + 1 min cool down", cardio: true },
+            { id: "dips", name: "EXTRA (Viking Press)", sets: "2 sets to failure", note: "" },
         ]
     },
     tuesday: {
