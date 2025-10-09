@@ -46,6 +46,8 @@ const Workouts = ({ onBackToHome }) => {
   const [yearGoalLocked, setYearGoalLocked] = useState(() => loadFromLocalStorage('yearGoalLocked', false));
   const [weightGoalLocked, setWeightGoalLocked] = useState(() => loadFromLocalStorage('weightGoalLocked', false));
   const [showHelp, setShowHelp] = useState(false);
+  const [isClosingProgress, setIsClosingProgress] = useState(false);
+  const [isClosingHelp, setIsClosingHelp] = useState(false);
   const [helpDismissed, setHelpDismissed] = useState(() =>
     loadFromLocalStorage('helpDismissed', false)
   );
@@ -64,6 +66,21 @@ const Workouts = ({ onBackToHome }) => {
       return null;
     }
   });
+  const handleCloseProgress = () => {
+    setIsClosingProgress(true);
+    setTimeout(() => {
+      setShowProgress(false);
+      setIsClosingProgress(false);
+    }, 100);
+  };
+
+  const handleCloseHelp = () => {
+    setIsClosingHelp(true);
+    setTimeout(() => {
+      setShowHelp(false);
+      setIsClosingHelp(false);
+    }, 100);
+  };
 
   // Main workout timer
   useEffect(() => {
@@ -601,8 +618,8 @@ const Workouts = ({ onBackToHome }) => {
       </main>
 
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, }}>
-          <div style={{ background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100, padding: 0, animation: 'fadeIn 0.3s ease-out' }}>
+          <div style={{ background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)', animation: 'slideUp 0.3s ease-out' }}>
             <div style={{
               width: 36,
               height: 5,
@@ -686,11 +703,12 @@ const Workouts = ({ onBackToHome }) => {
           inset: 0,
           background: 'rgba(0, 0, 0, 0.85)',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           justifyContent: 'center',
           zIndex: 100,
-          padding: 16,
-          backdropFilter: 'blur(8px)'
+          padding: 0,
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeIn 0.3s ease-out'
         }}>
           <div style={{
             background: '#FFFFFF',
@@ -698,10 +716,11 @@ const Workouts = ({ onBackToHome }) => {
             borderRadius: '12px 12px 0 0',
             width: '100%',
             maxWidth: 380,
-            maxHeight: '85vh',
+            maxHeight: '80vh',
             overflowY: 'auto',
             border: '1px solid rgba(139, 172, 255, 0.3)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            animation: isClosingHelp ? 'slideDown 0.3s ease-out' : 'slideUp 0.3s ease-out'
           }}>
             <div style={{
               width: 36,
@@ -863,8 +882,12 @@ const Workouts = ({ onBackToHome }) => {
             }}>
               <button
                 onClick={() => {
-                  setShowHelp(false);
-                  setHelpDismissed(true);
+                  setIsClosingHelp(true);
+                  setTimeout(() => {
+                    setShowHelp(false);
+                    setHelpDismissed(true);
+                    setIsClosingHelp(false);
+                  }, 300);
                 }}
                 style={{
                   width: '100%',
@@ -883,7 +906,7 @@ const Workouts = ({ onBackToHome }) => {
                 Got it! Don't show again
               </button>
               <button
-                onClick={() => setShowHelp(false)}
+                onClick={handleCloseHelp}
                 style={{
                   width: '100%',
                   padding: 14,
@@ -905,9 +928,11 @@ const Workouts = ({ onBackToHome }) => {
 
       {showProgress && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16,
+          position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100, padding: 0, animation: 'fadeIn 0.3s ease-out'
         }}>
-          <div style={{ background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+          <div style={{
+            background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)', animation: isClosingProgress ? 'slideDown 0.3s ease-out' : 'slideUp 0.3s ease-out'
+          }}>
             <div style={{
               width: 36,
               height: 5,
@@ -1104,17 +1129,30 @@ const Workouts = ({ onBackToHome }) => {
               )}
             </div>
 
-            <button onClick={() => setShowProgress(false)} style={{ width: '100%', padding: 12, background: '#FF3B30', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
+            <button
+              onClick={handleCloseProgress}
+              style={{
+                width: '100%',
+                padding: 12,
+                background: '#8E8E93',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: 14,
+              }}>
               Close
             </button>
           </div>
         </div >
-      )}
+      )
+      }
 
       {
         showSettings && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, }}>
-            <div style={{ background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100, padding: 0, animation: 'fadeIn 0.3s ease-out' }}>
+            <div style={{ background: '#FFFFFF', padding: '24px 20px 40px', borderRadius: '12px 12px 0 0', width: '100%', maxWidth: 360, maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)', animation: 'slideUp 0.3s ease-out' }}>
               <div style={{
                 width: 36,
                 height: 5,
@@ -1174,7 +1212,7 @@ const Workouts = ({ onBackToHome }) => {
                 </button>
               </div>
 
-              <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#FF3B30', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}>
+              <button onClick={() => setShowSettings(false)} style={{ width: '100%', padding: 12, background: '#8E8E93', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14, }}>
                 Close
               </button>
             </div>
@@ -1221,15 +1259,46 @@ const Workouts = ({ onBackToHome }) => {
       }
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% {
-            box-shadow: 0 4px 20px rgba(97, 175, 254, 0.4);
-          }
-          50% {
-            box-shadow: 0 4px 30px rgba(97, 175, 254, 0.7);
-          }
-        }
-      `}</style>
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(97, 175, 254, 0.4);
+    }
+    50% {
+      box-shadow: 0 4px 30px rgba(97, 175, 254, 0.7);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+`}</style>
     </div >
   );
 };
