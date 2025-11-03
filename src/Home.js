@@ -16,7 +16,30 @@ const Home = ({ onNavigateToWorkouts }) => {
                 { text: 'The only bad workout is the one that didn\'t happen.', author: 'Unknown' },
                 { text: 'Success is the sum of small efforts repeated day in and day out.', author: 'Robert Collier' },
                 { text: 'The body achieves what the mind believes.', author: 'Unknown' },
-                { text: 'Don\'t limit your challenges. Challenge your limits.', author: 'Unknown' }
+                { text: 'Don\'t limit your challenges. Challenge your limits.', author: 'Unknown' },
+                { text: 'Bozza, just do it.', author: 'Unknown' },
+                { text: 'No Risk, No Ferrari.', author: 'Unknown' },
+                { text: 'The only bad workout is the one that didn\'t happen.', author: 'Unknown' },
+                { text: 'Sweat is just fat crying.', author: 'Unknown' },
+                { text: 'Strive for progress, not perfection.', author: 'Unknown' },
+                { text: 'Motivation is what gets you started. Habit is what keeps you going.', author: 'Unknown' },
+                { text: 'Motivation is what gets you started. Habit is what keeps you going.', author: 'Unknown' },
+                { text: 'The pain you feel today will be the strength you feel tomorrow.', author: 'Unknown' },
+                { text: 'Don\'t stop when you\'re tired; stop when you\'re done.', author: 'Unknown' },
+                { text: 'The difference between try and triumph is a little umph.', author: 'Unknown' },
+                { text: 'Train insane or remain the same.', author: 'Unknown' },
+                { text: 'Eish braaaa just go', author: 'Unknown' },
+                { text: 'A Viking does not fear the storm; he becomes it.', author: 'Unknown' },
+                { text: 'Boss, if I can you can', author: 'Unknown' },
+                { text: 'If I can do it, So can you', author: 'Unknown' },
+                { text: 'Merry Chrisler', author: 'Unknown' },
+                { text: 'Wa wa wiewa, king in the castle, king in the castle, I’ve got a chair, I’ve got a chair. ', author: 'Unknown' },
+                { text: 'whats up with it vanilla face', author: 'Unknown' },
+                { text: 'Bang bang skit skit', author: 'Unknown' },
+                { text: 'Is this a cat in a hat?', author: 'Unknown' },
+                { text: 'im recently retired...you are retard?', author: 'Unknown' },
+                { text: 'This suit is black.............NOT', author: 'Unknown' },
+                { text: 'Very nice, how much?', author: 'Unknown' },
             ];
             const randomFallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
             setMotivationalQuote(randomFallback);
@@ -71,7 +94,7 @@ const Home = ({ onNavigateToWorkouts }) => {
                     color: '#8E8E93',
                     fontSize: 13,
                     fontWeight: 400
-                }}>by DinoTheDeveloper</div>
+                }}>by UnknownTheDeveloper</div>
             </header>
 
             <div style={{ padding: '0 20px' }}>

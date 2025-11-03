@@ -24,18 +24,18 @@ const Workouts = ({ onBackToHome }) => {
   const [notes, setNotes] = useState(() => loadFromLocalStorage('notes', {}));
   const [completed, setCompleted] = useState(() => loadFromLocalStorage('completed', {}));
   const [collapsed, setCollapsed] = useState({
-    monday: true,
-    tuesday: true,
-    wednesday: true,
-    thursday: true,
-    friday: true,
-    saturday: true,
-    sunday: true
+    Day1: true,
+    Day2: true,
+    Day3: true,
+    Day4: true,
+    Day5: true,
+    Day6: true,
+    Day7: true
   });
   const [allUsers, setAllUsers] = useState(() => loadFromLocalStorage('allUsers', ['User 1']));
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
-  const [mainTimer, setMainTimer] = useState(0);
+  // const [mainTimer, setMainTimer] = useState(0);
   const [mainRunning, setMainRunning] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [editUserName, setEditUserName] = useState('');
@@ -83,13 +83,13 @@ const Workouts = ({ onBackToHome }) => {
   };
 
   // Main workout timer
-  useEffect(() => {
-    let interval;
-    if (mainRunning) {
-      interval = setInterval(() => setMainTimer(prev => prev + 1), 1000);
-    }
-    return () => clearInterval(interval);
-  }, [mainRunning]);
+  // useEffect(() => {
+  //   let interval;
+  //   if (mainRunning) {
+  //     interval = setInterval(() => setMainTimer(prev => prev + 1), 1000);
+  //   }
+  //   return () => clearInterval(interval);
+  // }, [mainRunning]);
 
   // Save to localStorage whenever data changes
   useEffect(() => {
@@ -266,18 +266,18 @@ const Workouts = ({ onBackToHome }) => {
     return prs;
   };
 
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60).toString().padStart(2, '0');
-    const s = (sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
+  // const formatTime = (sec) => {
+  //   const m = Math.floor(sec / 60).toString().padStart(2, '0');
+  //   const s = (sec % 60).toString().padStart(2, '0');
+  //   return `${m}:${s}`;
+  // };
 
   const resetAllData = () => {
     if (window.confirm('Reset all data?')) {
       setWeights({});
       setNotes({});
       setCompleted({});
-      setMainTimer(0);
+      // setMainTimer(0);
       setMainRunning(false);
       setWorkoutStreak(0);
       setLastWorkoutDate(null);
@@ -419,7 +419,7 @@ const Workouts = ({ onBackToHome }) => {
           ))}
         </div>
 
-        <div style={{
+        {/* <div style={{
           background: '#F2F2F7',
           border: '1px solid #E5E5EA',
           borderRadius: 14,
@@ -475,7 +475,7 @@ const Workouts = ({ onBackToHome }) => {
               </button>
             )}
           </div>
-        </div>
+        </div> */}
       </header>
 
       <main style={{ padding: 20, paddingBottom: 80 }}>
