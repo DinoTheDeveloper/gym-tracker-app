@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import workouts from './workoutData';
 
 const saveToLocalStorage = (key, value) => {
@@ -36,7 +36,7 @@ const Workouts = ({ onBackToHome }) => {
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState('');
   // const [mainTimer, setMainTimer] = useState(0);
-  const [mainRunning, setMainRunning] = useState(false);
+  // const [mainRunning, setMainRunning] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [editUserName, setEditUserName] = useState('');
   const [showProgress, setShowProgress] = useState(false);
@@ -278,7 +278,7 @@ const Workouts = ({ onBackToHome }) => {
       setNotes({});
       setCompleted({});
       // setMainTimer(0);
-      setMainRunning(false);
+      // setMainRunning(false);
       setWorkoutStreak(0);
       setLastWorkoutDate(null);
       setYearGoal('');
